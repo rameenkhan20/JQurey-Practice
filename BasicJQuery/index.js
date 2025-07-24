@@ -11,7 +11,7 @@ $(document).keypress(function(e){
 	$("h1").text(e.key);
 });
 
- In Pure Js 
+  //   "  In Pure Js '
 // document.addEventListener("keydown", function(e){
 // 	var heading = document.querySelector("h1");
 // 	heading.innerHTML = e.key;
