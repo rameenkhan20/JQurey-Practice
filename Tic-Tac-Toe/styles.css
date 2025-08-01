@@ -1,0 +1,49 @@
+body {
+
+	display: flex;
+	background-color: black;
+	height: 100vh;
+	align-items: center;
+	justify-content: center;
+	text-align: center;
+	margin: 0;
+}
+
+.protest-revolution-regular {
+  font-family: "Protest Revolution", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+h1{
+	font-size: 3.3rem;
+}
+.box{
+	height: 90px;
+	width: 90px;
+	outline: 2px solid white;
+}
+.player-info{
+	display:flex;
+	justify-content: center;
+	align-items: center;
+	align-content: space-between;
+	gap: 80px;
+}
+
+.gap-7{
+	height: 10rem;
+}
+
+table {
+	margin: 0px auto;
+}
+
+.primary-color {
+	color: whitesmoke;
+}
+.secondary-color{
+	color: black;
+}
+.vs{
+	font-size: 2rem;
+}
