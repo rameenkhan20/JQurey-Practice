@@ -1,8 +1,10 @@
-(function($) {
 
-    $(function() {
+(function($){
 
-        const possible_matched      = [
+    $(function() {                   // .ready 
+
+
+        const possible_success_matches =  [
 
                                         [ $(".box-1"), $(".box-2"), $(".box-3") ],
                                         [ $(".box-4"), $(".box-5"), $(".box-6") ],
@@ -15,47 +17,197 @@
 
                                     ];
 
-        var boxes                   = $("#tic-tac-toe tr td");
+    
+        popup_style.SelectPlayersName().then(res => {
 
-        $.each( boxes, function( index, element ) {
+            if(res.isConfirmed){
 
-            console.log( index, element );
+                var player1_name       = res.value.player1;
+
+                var player2_name       = res.value.player2;
+
+                var player1_mark       = res.value.choosen_mark;
+
+                var player2_mark       = (player1_mark === "X") ? "O" : "X"; 
+
+                var current_player     = Math.floor(Math.random() * 2);
+
+                var current_turn       = (current_player == "0") ? ".player1" : ".player2";
+
+                $(current_turn).addClass("active");
+
+                let boxes              = $("#tic-tac-toe tr td");
+
+                var is_winner          = false;
+
+                var allMarked          = false;
+
+                var win_count          = 0;
+
+                var player1_wins       = 0;
+
+                var player2_wins       = 0;
+
+                console.log("before",player1_wins);
+
+                boxes.on("click", function (e) {
+                    
+                    if ($(this).attr("data-mark")) return;
+
+                    let mark = (current_player == "0") ? player1_mark : player2_mark;
+
+                    $(this).attr("data-mark", mark).text(mark);
+
+                    let player_name = (current_player == "0") ? player1_name : player2_name;
+
+                    current_player = (current_player == "0") ? "1" : "0";
+                    
+                    $.each(possible_success_matches , function( index , element ){   // key , value pair
+
+                        let element1 = element[0].attr("data-mark");
+
+                        let element2 = element[1].attr("data-mark");
+
+                        let element3 = element[2].attr("data-mark");
+
+                        if(element1 && element2 && element3) {
+                            if(element1 == element2 && element2 == element3 && element1 == element3){
+
+                                popup_style.message( {title : `The Winner is ${player_name}` , icon : "success"})
+
+                                boxes.attr("data-mark","  ");
+
+                                current_player = (current_player == "0") ? "1" : "0";
+
+                                win_count++;
+
+                                (current_player == "0") ? (player1_wins += 1) : (player2_wins += 1);
+
+                                console.log("after" , player1_wins);
+                                is_winner = true;
+                                return false;
+
+                            }
+                        }
+                    })
+
+                    if(!is_winner){
+                        boxes.each(function () {
+                            if ($(this).attr("data-mark") === undefined) {
+                                allMarked = false;
+                                return false; // break the loop
+                            }else{
+                                allMarked = true;
+                            }
+                        });
+                    }
+
+                    if(allMarked){
+                        popup_style.message( {title : "Its a Draw" , icon : "warning"})
+                    }
+
+                    $(current_turn).removeClass("active");
+
+                    current_turn = (current_player == "0") ? ".player1" : ".player2";
+
+                    $(current_turn).addClass("active");
+
+                })
+            }
+
 
         });
 
     });
 
-})(jQuery)
+})(jQuery);
+
+
 
 var popup_style = {
 
-    SelectPlayersName : function( params ) {
+    SelectPlayersName : function( prams ) {
 
-        Swal.fire({
+        if ( typeof prams == "undefined") prams = {}
 
-            title: "Enter Your Names",
+        $defaults = {
+            player1_name               : "Player 1",
+            player2_name               : "Player 2",
+            title                      : "Enter Your Names",
+            player1_html_attr          : "#player1-btn",
+            player2_html_attr          : "#player2-btn"  
+        }
+
+        $.each($defaults,function(key,value) {
+            prams[key] = ( typeof prams[key] == "undefined") ? value : prams[key];
+        });
+
+        let choosen_mark = "";
+
+        return Swal.fire({
+
+            title: prams.title,
             html: `
-              <input id="swal-input1" class="swal2-input" placeholder="Player 1">
-              <input id="swal-input2" class="swal2-input" placeholder="Player 2">
+                <input id="swal-input1" class="swal2-input" placeholder= ${prams.player1_name} >
+                <input id="swal-input2" class="swal2-input" placeholder= ${prams.player2_name} >
+                <div>
+                    <h4> ${prams.player1_name} Picks </h4>
+                    <input type="radio" id="mark_selection1" name="mark" value="X">
+                    <label for="mark_selection1"> X </label>
+                    <input type="radio" id="mark_selection2" name="mark" value="O">
+                    <label for="mark_selection2"> O </label>
+                </div>
             `,
             preConfirm: () => {
 
-                const player1 = $("#swal-input1").val() === "" ? "Player 1" : $("#swal-input1").val();
-                const player2 = $("#swal-input2").val() === "" ? "Player 2" : $("#swal-input1").val();;
+                let player1   = $("#swal-input1").val() === "" ? prams.player1_name : $("#swal-input1").val();
+                let player2   = $("#swal-input2").val() === "" ? prams.player2_name : $("#swal-input2").val();
+                choosen_mark    = $("input[name='mark']:checked").val();
 
-                $("#player1-btn").text(player1);
-                $("#player2-btn").text(player2);
+                if(!choosen_mark){
+                    Swal.showValidationMessage("Please select X or O");
+                    return false;
+                }
+
+                player_1 = `${player1} : ${choosen_mark}`;
+                player_2 = `${player2} : ${(choosen_mark === "X") ? "O" : "X"}`;
+
+                $(prams.player1_html_attr).text(player_1);
+                $(prams.player2_html_attr).text(player_2);
+
+                arg ={
+                    choosen_mark  :choosen_mark,
+                    player1       :player1,
+                    player2       :player2
+                }
+
+                return arg;
+
             }
-        });
 
+
+        })
+    
     },
 
-    message : function( Title,icon = '' ){
+    message : function( prams ){
+
+        if ( typeof prams == "undefined") prams = {}
+
+        $defaults = {
+            title               : "",
+            icon                : ""
+            
+        }
+
+        $.each($defaults,function(key,value) {
+            prams[key] = ( typeof prams[key] == "undefined") ? value : prams[key];
+        });
 
         Swal.fire({
 
-            title: Title,
-            icon: icon,
+            title: prams.title,
+            icon: prams.icon,
             // showClass: {
             //     popup: `
             //       animate__animated
@@ -75,5 +227,7 @@ var popup_style = {
 
 };
 
-popup_style.SelectPlayersName();
+// popup_style.message( {title:"The winner ____",icon:"success"} );
+// popup_style.SelectPlayersName();
+
 
