@@ -1,5 +1,30 @@
-body {
+html, body {
 
+	font-size: 16px;
+
+}
+
+@media (max-width: 767px) {
+
+	html, body {
+
+		font-size: 14px;
+
+	}
+
+}
+
+@media (max-width: 1024px) {
+
+	html, body {
+
+		font-size: 15px;
+
+	}
+
+}
+
+body {
 	display: flex;
 	background-color: black;
 	height: 100vh;
@@ -10,60 +35,84 @@ body {
 }
 
 .protest-revolution-regular {
+
   font-family: "Protest Revolution", sans-serif;
   font-weight: 400;
   font-style: normal;
+
 }
-h1{
-	font-size: 3.3rem;
-}
+
+.heading-58 {font-size: 3.3rem;}
+
+.heading-32 {font-size: 2rem;}
+
+.heading-24 {font-size: 1.5rem;}
+
+.heading-20 {font-size: 1.2rem;}
+
 .box{
+
 	height: 90px;
 	width: 90px;
 	outline: 2px solid white;
+
 }
+
 .player-info{
+
 	display:flex;
 	justify-content: center;
 	align-items: center;
 	align-content: space-between;
-	gap: 80px;
-}
-
-.gap-7{
 	height: 10rem;
+
 }
 
-table {
-	margin: 0px auto;
-}
+.gap-7 {gap: 5rem;}
 
-.primary-color {
-	color: whitesmoke;
-}
-.secondary-color{
-	color: black;
-}
-.vs{
-	font-size: 2rem;
-}
+.gap-3 {gap: 1rem;}
+
+.primary-color {color: whitesmoke;}
+
+.secondary-color {color: black;}
+
+table {margin: 0px auto;}
 
 td{
 	color: whitesmoke;
 	font-size: 2rem;
 }
 
-.player{
+.player .player_name{
 
 	border-bottom: 2px solid transparent;
   margin: 0;
   text-align: right;
   transition: all 0.25s;
   -webkit-transition: all 0.25s;
+
 }
 
-.player.active{
-	 box-shadow: 0 1px 1px rgba(0,0,0,.16);
+.player.active .player_name{
   box-shadow: 0 1px 1px rgba(0,0,0,.16);
   border-color: red;
+}
+
+.d-flex {display: flex;}
+
+.dir-col {flex-direction: column;}
+
+.justify-center {justify-content: center;}
+
+.center-align {align-items: center;}
+
+svg{
+	height: 19px;
+	width: 19px;
+}
+
+.reset-btn{
+	margin: 0px auto;
+	padding: 7px 9px;
+	border-radius: 20px;
 }
