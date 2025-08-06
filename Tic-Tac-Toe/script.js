@@ -3,6 +3,8 @@
 
     $(function() {                   // .ready 
 
+        var player1_wins       = 0;
+        var player2_wins       = 0;
 
         const possible_success_matches =  [
 
@@ -17,14 +19,20 @@
 
                                     ];
 
-    
-        popup_style.SelectPlayersName().then(res => {
+        $(".player1:not(:has(.win_count_player1))").append("<span class='win_count_player1 heading-24 '> Wins:  0 </span>")  //for adding #wins
+        $(".player2:not(:has(.win_count_player2))").append("<span class='win_count_player2 heading-24 '> Wins:  0 </span>")
+
+        popup_style.SelectPlayersName().then( res => {
 
             if(res.isConfirmed){
 
                 var player1_name       = res.value.player1;
 
                 var player2_name       = res.value.player2;
+
+                // var player1_wins       = parseInt(localStorage.getItem(player1_wins)) || 0; 
+
+                // var player2_wins       = parseInt(localStorage.getItem(player2_wins)) || 0;
 
                 var player1_mark       = res.value.choosen_mark;
 
@@ -42,25 +50,48 @@
 
                 var allMarked          = false;
 
-                var win_count          = 0;
+                let reset_button       = $(".reset-btn");
 
-                var player1_wins       = 0;
+                reset_button.on("click" , function(evt){
 
-                var player2_wins       = 0;
+                    popup_style.confirmation().then((result) => {
+                        if (result.isConfirmed) {
+                            Swal.fire({
+                                title: "The Game Begins Now!",
+                                icon: "success"
+                            });
+                            boxes.removeAttr("data-mark");
+                            boxes.text("");
 
-                console.log("before",player1_wins);
+                            is_winner          = false;
+
+                            allMarked          = false;
+    
+                            current_player     = Math.floor(Math.random() * 2);
+    
+                            current_turn       = (current_player == "0") ? ".player1" : ".player2";
+    
+                            $(current_turn).addClass("active");
+
+
+                        }
+                        
+
+                    });
+
+                })
 
                 boxes.on("click", function (e) {
                     
-                    if ($(this).attr("data-mark")) return;
+                    if ($(this).attr("data-mark")) return;     //if already has marked
 
-                    let mark = (current_player == "0") ? player1_mark : player2_mark;
+                    let mark = (current_player == "0") ? player1_mark : player2_mark;  //player marks on the grid
 
-                    $(this).attr("data-mark", mark).text(mark);
+                    $(this).attr("data-mark", mark).text(mark);   //mark added
 
-                    let player_name = (current_player == "0") ? player1_name : player2_name;
+                    let player_name = (current_player == "0") ? player1_name : player2_name;    
 
-                    current_player = (current_player == "0") ? "1" : "0";
+                    current_player = (current_player == "0") ? "1" : "0";   //switching turns 
                     
                     $.each(possible_success_matches , function( index , element ){   // key , value pair
 
@@ -71,36 +102,58 @@
                         let element3 = element[2].attr("data-mark");
 
                         if(element1 && element2 && element3) {
-                            if(element1 == element2 && element2 == element3 && element1 == element3){
+
+                            if (  element1 == element2 && element2 == element3 && element1 == element3 ) {
 
                                 popup_style.message( {title : `The Winner is ${player_name}` , icon : "success"})
 
-                                boxes.attr("data-mark","  ");
+                                boxes.attr( "data-mark","  " );   
+                                
+                                current_player = (current_player == "0") ? "1" : "0";     //current player == winner 
 
-                                current_player = (current_player == "0") ? "1" : "0";
-
-                                win_count++;
-
-                                (current_player == "0") ? (player1_wins += 1) : (player2_wins += 1);
-
-                                console.log("after" , player1_wins);
+                                // (current_player == "0") ? (player1_wins += 1) : (player2_wins += 1);  // win-count 
                                 is_winner = true;
+                                
+                                // adding name and #win to local storage 
+
+                                if(current_player == "0"){
+                                    player1_wins += 1;
+                                    $(".win_count_player1").text("Wins:  " + player1_wins);
+                                    // localStorage.setItem( player1_name , player1_wins);
+                                }
+                                else{
+                                    player2_wins += 1;
+                                    $(".win_count_player2").text("Wins:  " +player2_wins);
+                                    // localStorage.setItem( player2_name , player2_wins); 
+                                }
+
+                                
                                 return false;
 
                             }
                         }
                     })
 
-                    if(!is_winner){
+                    
+
+                    if(!is_winner){             //When there a Draw Logic
+
                         boxes.each(function () {
+
                             if ($(this).attr("data-mark") === undefined) {
+
                                 allMarked = false;
+
                                 return false; // break the loop
+
                             }else{
                                 allMarked = true;
                             }
                         });
                     }
+
+                    
+
 
                     if(allMarked){
                         popup_style.message( {title : "Its a Draw" , icon : "warning"})
@@ -111,6 +164,8 @@
                     current_turn = (current_player == "0") ? ".player1" : ".player2";
 
                     $(current_turn).addClass("active");
+
+                    console.log("allMarked",allMarked,"is_winner", is_winner)
 
                 })
             }
@@ -175,7 +230,7 @@ var popup_style = {
                 $(prams.player1_html_attr).text(player_1);
                 $(prams.player2_html_attr).text(player_2);
 
-                arg ={
+                arg = {
                     choosen_mark  :choosen_mark,
                     player1       :player1,
                     player2       :player2
@@ -223,6 +278,18 @@ var popup_style = {
                 `
             }
         });
+    },
+
+    confirmation : function(){
+        return Swal.fire({
+            title: "Are you sure?",
+            text: "Reset the game now!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "Black",
+            cancelButtonColor: "Black",
+            confirmButtonText: "Yes!"
+        })
     },
 
 };
